@@ -19,22 +19,19 @@ def medir_tempo(func, arr):
 
 def shell_sort(arr):
     n = len(arr)
-    gap = n // 2  # Intervalo inicial
+    gap = n // 2
 
     while gap > 0:
-        # Realiza um Insertion Sort para cada gap.
         for i in range(gap, n):
             temp = arr[i]
             j = i
 
-            # Compara elementos afastados pelo gap.
             while j >= gap and arr[j - gap] > temp:
                 arr[j] = arr[j - gap]
                 j -= gap
 
             arr[j] = temp
 
-        # Reduz o gap pela metade.
         gap //= 2
 
     return arr
@@ -44,7 +41,6 @@ def shell_sort_knuth(arr):
     n = len(arr)
     h = 1
 
-    # 1, 4, 13, 40, 121...
     while h < n // 3:
         h = 3 * h + 1
 

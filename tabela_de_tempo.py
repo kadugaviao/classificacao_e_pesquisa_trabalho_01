@@ -19,7 +19,6 @@ def medir_tempo(func, arr):
 
 
 def medir_media(func, arr, repeticoes):
-    # Execucao de aquecimento para reduzir variacoes de primeira chamada.
     medir_tempo(func, arr)
 
     total = 0.0
