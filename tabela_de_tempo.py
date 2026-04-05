@@ -24,24 +24,25 @@ def medir_media(func, arr, repeticoes):
 		total += medir_tempo(func, arr)
 	return total / repeticoes
 
-def formatar_celula(tempo, pior_tempo):
-	if pior_tempo == 0:
-		ganho = 0.0
+def formatar_celula(tempo, tempo_contraparte):
+	if tempo_contraparte == 0:
+		diferenca = 0.0
 	else:
-		ganho = ((pior_tempo - tempo) / pior_tempo) * 100
-	return f"{tempo:.8f}s ({ganho:.2f}%)"
+		diferenca = ((tempo_contraparte - tempo) / tempo_contraparte) * 100
+	return f"{tempo:.8f}s ({diferenca:+.2f}%)"
 
 
-def imprimir_tabela(cenarios, resultados, ordem_colunas):
+def imprimir_tabela(resultados, ordem_colunas, contraparte):
 	cabecalho = ["Algoritmo"] + [titulo for titulo, _ in ordem_colunas]
 
 	linhas = []
 	for nome_algoritmo in resultados:
 		linha = [nome_algoritmo]
+		nome_contraparte = contraparte[nome_algoritmo]
 		for _, chave_cenario in ordem_colunas:
 			tempo = resultados[nome_algoritmo][chave_cenario]
-			pior_tempo = cenarios[chave_cenario]["pior_tempo"]
-			linha.append(formatar_celula(tempo, pior_tempo))
+			tempo_contraparte = resultados[nome_contraparte][chave_cenario]
+			linha.append(formatar_celula(tempo, tempo_contraparte))
 		linhas.append(linha)
 
 	larguras = [len(texto) for texto in cabecalho]
@@ -52,7 +53,7 @@ def imprimir_tabela(cenarios, resultados, ordem_colunas):
 	def montar_linha(colunas):
 		return " | ".join(colunas[i].ljust(larguras[i]) for i in range(len(colunas)))
 
-	print("Tabela de tempos (valor em segundos e % mais rapido que o pior caso da coluna)")
+	print("Tabela de tempos (valor em segundos e % relativo a contraparte; negativo = pior)")
 	print(montar_linha(cabecalho))
 	print("-+-".join("-" * largura for largura in larguras))
 	for linha in linhas:
@@ -84,10 +85,21 @@ def main():
 		("Invertida", "invertida"),
 	]
 
+	contraparte = {
+		"Bubble Sort": "Bubble Sort Otimizado",
+		"Bubble Sort Otimizado": "Bubble Sort",
+		"Selection Sort": "Selection Cocktail",
+		"Selection Cocktail": "Selection Sort",
+		"Insertion Sort": "Insertion Binario",
+		"Insertion Binario": "Insertion Sort",
+		"Shell Sort": "Shell Sort Otimizado",
+		"Shell Sort Otimizado": "Shell Sort",
+	}
+
 	cenarios = {
-		"aleatoria": {"array": arr_aleatoria, "pior_tempo": 0.0},
-		"ordenada": {"array": arr_ordenada, "pior_tempo": 0.0},
-		"invertida": {"array": arr_invertida, "pior_tempo": 0.0},
+		"aleatoria": {"array": arr_aleatoria},
+		"ordenada": {"array": arr_ordenada},
+		"invertida": {"array": arr_invertida},
 	}
 
 	resultados = {}
@@ -97,10 +109,8 @@ def main():
 		for _, chave_cenario in ordem_colunas:
 			tempo = medir_media(func, cenarios[chave_cenario]["array"], repeticoes)
 			resultados[nome][chave_cenario] = tempo
-			if tempo > cenarios[chave_cenario]["pior_tempo"]:
-				cenarios[chave_cenario]["pior_tempo"] = tempo
 
-	imprimir_tabela(cenarios, resultados, ordem_colunas)
+	imprimir_tabela(resultados, ordem_colunas, contraparte)
 
 
 if __name__ == "__main__":
