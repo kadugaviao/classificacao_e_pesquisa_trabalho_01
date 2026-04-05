@@ -24,25 +24,24 @@ def medir_media(func, arr, repeticoes):
 		total += medir_tempo(func, arr)
 	return total / repeticoes
 
-def formatar_celula(tempo, tempo_contraparte):
-	if tempo_contraparte == 0:
+def formatar_celula(tempo, tempo_base):
+	if tempo_base == 0:
 		diferenca = 0.0
 	else:
-		diferenca = ((tempo_contraparte - tempo) / tempo_contraparte) * 100
+		diferenca = ((tempo_base - tempo) / tempo_base) * 100
 	return f"{tempo:.8f}s ({diferenca:+.2f}%)"
 
 
-def imprimir_tabela(resultados, ordem_colunas, contraparte):
+def imprimir_tabela(resultados, ordem_colunas, algoritmo_base):
 	cabecalho = ["Algoritmo"] + [titulo for titulo, _ in ordem_colunas]
 
 	linhas = []
 	for nome_algoritmo in resultados:
 		linha = [nome_algoritmo]
-		nome_contraparte = contraparte[nome_algoritmo]
 		for _, chave_cenario in ordem_colunas:
 			tempo = resultados[nome_algoritmo][chave_cenario]
-			tempo_contraparte = resultados[nome_contraparte][chave_cenario]
-			linha.append(formatar_celula(tempo, tempo_contraparte))
+			tempo_base = resultados[algoritmo_base][chave_cenario]
+			linha.append(formatar_celula(tempo, tempo_base))
 		linhas.append(linha)
 
 	larguras = [len(texto) for texto in cabecalho]
@@ -53,7 +52,7 @@ def imprimir_tabela(resultados, ordem_colunas, contraparte):
 	def montar_linha(colunas):
 		return " | ".join(colunas[i].ljust(larguras[i]) for i in range(len(colunas)))
 
-	print("Tabela de tempos (valor em segundos e % relativo a contraparte; negativo = pior)")
+	print("Tabela de tempos (valor em segundos e % relativo ao Bubble Sort base; negativo = pior)")
 	print(montar_linha(cabecalho))
 	print("-+-".join("-" * largura for largura in larguras))
 	for linha in linhas:
@@ -85,16 +84,7 @@ def main():
 		("Invertida", "invertida"),
 	]
 
-	contraparte = {
-		"Bubble Sort": "Bubble Sort Otimizado",
-		"Bubble Sort Otimizado": "Bubble Sort",
-		"Selection Sort": "Selection Cocktail",
-		"Selection Cocktail": "Selection Sort",
-		"Insertion Sort": "Insertion Binario",
-		"Insertion Binario": "Insertion Sort",
-		"Shell Sort": "Shell Sort Otimizado",
-		"Shell Sort Otimizado": "Shell Sort",
-	}
+	algoritmo_base = "Bubble Sort"
 
 	cenarios = {
 		"aleatoria": {"array": arr_aleatoria},
@@ -110,7 +100,7 @@ def main():
 			tempo = medir_media(func, cenarios[chave_cenario]["array"], repeticoes)
 			resultados[nome][chave_cenario] = tempo
 
-	imprimir_tabela(resultados, ordem_colunas, contraparte)
+	imprimir_tabela(resultados, ordem_colunas, algoritmo_base)
 
 
 if __name__ == "__main__":
